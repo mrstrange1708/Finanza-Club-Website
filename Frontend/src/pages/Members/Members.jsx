@@ -1,47 +1,176 @@
+import React, { useState, useEffect } from 'react';
+import { FaLinkedinIn, FaGithub, FaTwitter } from 'react-icons/fa';
+import { getMembers } from '../../api/membersApi';
+
 export default function Members() {
-  const members = [
-    { name: "Amogha", role: "President", image: "https://via.placeholder.com/150?text=A" },
-    { name: "Manas", role: "Vice President", image: "https://via.placeholder.com/150?text=M" },
-    { name: "Shiddhant", role: "Treasurer", image: "https://via.placeholder.com/150?text=S" },
-    { name: "Junaid", role: "Secretary", image: "https://via.placeholder.com/150?text=J" },
-    { name: "Vishal", role: "Event Coordinator", image: "https://via.placeholder.com/150?text=V" },
-  ];
+    const [boardMembers, setBoardMembers] = useState([]);
+    const [coreTeam, setCoreTeam] = useState([]);
+    const [previousMembers, setPreviousMembers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  return (
-    <section className="container mx-auto px-4 py-12">
-      <h2 className="text-4xl font-bold mb-4 text-center" style={{ color: '#C0003D' }}>Our Core Members</h2>
-      <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Meet the dedicated team leading Finanza Club and driving our mission forward.
-      </p>
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await getMembers();
+                const data = response.data;
+                console.log(data)
+                const fetchedBoard = data.filter(m => m.category === 'board');
+                const fetchedCore = data.filter(m => m.category === 'core');
+                const fetchedPrevious = data.filter(m => m.category === 'alumni');
 
-      <div className="flex justify-center gap-8 flex-wrap">
-        {members.map((member, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden w-64 hover:shadow-lg transition-shadow duration-300 border border-gray-100">
-            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48" />
-            <div className="p-6 text-center">
-              <h3 className="text-xl font-bold" style={{ color: '#C0003D' }}>{member.name}</h3>
-              <p className="text-gray-600 mt-2">{member.role}</p>
-              <div className="mt-4 flex justify-center space-x-4">
-                <a href="#" style={{ color: '#C0003D' }} className="hover:opacity-75">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path>
-                  </svg>
-                </a>
-                <a href="#" style={{ color: '#C0003D' }} className="hover:opacity-75">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-                  </svg>
-                </a>
-                <a href="#" style={{ color: '#C0003D' }} className="hover:opacity-75">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z" clipRule="evenodd"></path>
-                  </svg>
-                </a>
-              </div>
+                setBoardMembers(fetchedBoard);
+                setCoreTeam(fetchedCore);
+                setPreviousMembers(fetchedPrevious);
+                setLoading(false);
+            } catch (err) {
+                console.error("Error fetching members:", err);
+                setError("Unable to load team members at this time.");
+                setLoading(false);
+            }
+        };
+
+        fetchMembers();
+    }, []);
+
+    const MemberCard = ({ member, variant = "default" }) => {
+        const isBoard = variant === "board";
+
+        // Assuming backend returns socials as an object, e.g., { linkedin: "url", ... }
+        const socials = member.socials || {};
+
+        return (
+            <div className={`group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ${isBoard ? 'hover:-translate-y-2' : 'hover:-translate-y-1'}`}>
+                {/* Background Pattern */}
+                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-[#C0003D] to-[#FF4D7D] opacity-100">
+                    <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
+                </div>
+
+                {/* Profile Image */}
+                <div className="relative pt-16 px-6 text-center">
+                    <div className={`relative mx-auto rounded-full p-1 bg-white ${isBoard ? 'w-32 h-32' : 'w-24 h-24'} shadow-md mb-4 group-hover:scale-105 transition-transform duration-300`}>
+                        <img
+                            src={member.image || "https://via.placeholder.com/400?text=Member"}
+                            alt={member.name}
+                            className="w-full h-full rounded-full object-cover"
+                        />
+                    </div>
+
+                    {/* Info */}
+                    <div className="mb-6">
+                        <h3 className={`${isBoard ? 'text-2xl' : 'text-xl'} font-bold text-gray-800 mb-1`}>{member.name}</h3>
+                        <p className="text-[#C0003D] font-medium text-sm tracking-wide uppercase mb-3">{member.role}</p>
+                        <p className="text-gray-500 text-sm italic">"{member.bio || 'Finanza Club Member'}"</p>
+                    </div>
+
+                    {/* Socials */}
+                    <div className={`flex justify-center gap-4 pb-8 transition-colors duration-300`}>
+                        {socials.linkedin && (
+                            <a href={socials.linkedin} className="text-gray-400 hover:text-[#0077b5] transition-colors p-2 bg-gray-50 rounded-full hover:bg-blue-50">
+                                <FaLinkedinIn size={18} />
+                            </a>
+                        )}
+                        {socials.github && (
+                            <a href={socials.github} className="text-gray-400 hover:text-black transition-colors p-2 bg-gray-50 rounded-full hover:bg-gray-200">
+                                <FaGithub size={18} />
+                            </a>
+                        )}
+                        {socials.twitter && (
+                            <a href={socials.twitter} className="text-gray-400 hover:text-[#1DA1F2] transition-colors p-2 bg-gray-50 rounded-full hover:bg-blue-50">
+                                <FaTwitter size={18} />
+                            </a>
+                        )}
+                    </div>
+                </div>
+
+                {/* Hover overlay border effect */}
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#C0003D]/10 rounded-2xl pointer-events-none transition-colors"></div>
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+        );
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen pt-24 pb-24 flex justify-center items-center bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C0003D]"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen pt-24 pb-24 flex justify-center items-center bg-white text-center px-4">
+                <div>
+                    <p className="text-xl text-gray-800 mb-2">Oops! Something went wrong.</p>
+                    <p className="text-gray-500">{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-[#FAF9F6] min-h-screen pt-20 pb-20">
+
+            {/* Header */}
+            <section className="text-center mb-20 px-4">
+                <h1 className="text-5xl font-bold text-gray-900 mb-6">Our <span className="text-[#C0003D]">Team</span></h1>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Meet the visionaries, creators, and leaders driving the Finanza Club forward.
+                </p>
+            </section>
+
+            {/* Board Members Section */}
+            {boardMembers.length > 0 && (
+                <section className="container mx-auto px-4 mb-24">
+                    <div className="flex items-center gap-4 mb-12 justify-center">
+                        <div className="h-px bg-gray-300 w-16"></div>
+                        <h2 className="text-3xl font-bold text-gray-800 uppercase tracking-widest">Board Members</h2>
+                        <div className="h-px bg-gray-300 w-16"></div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {boardMembers.map((m, i) => (
+                            <MemberCard key={i} member={m} variant="board" />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* Core Team Section */}
+            {coreTeam.length > 0 && (
+                <section className="container mx-auto px-4 mb-24">
+                    <div className="flex items-center gap-4 mb-12 justify-center">
+                        <div className="h-px bg-gray-300 w-16"></div>
+                        <h2 className="text-2xl font-bold text-gray-700 uppercase tracking-widest">Core Team</h2>
+                        <div className="h-px bg-gray-300 w-16"></div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {coreTeam.map((m, i) => (
+                            <MemberCard key={i} member={m} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* Previous Members Section */}
+            {previousMembers.length > 0 && (
+                <section className="container mx-auto px-4">
+                    <div className="flex items-center gap-4 mb-12 justify-center">
+                        <div className="h-px bg-gray-300 w-16"></div>
+                        <h2 className="text-2xl font-bold text-gray-500 uppercase tracking-widest">Alumni & Previous Members</h2>
+                        <div className="h-px bg-gray-300 w-16"></div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 opacity-80 hover:opacity-100 transition-opacity">
+                        {previousMembers.map((m, i) => (
+                            <MemberCard key={i} member={m} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {boardMembers.length === 0 && coreTeam.length === 0 && previousMembers.length === 0 && (
+                <div className="text-center text-gray-500">No members found.</div>
+            )}
+
+        </div>
+    );
 }
