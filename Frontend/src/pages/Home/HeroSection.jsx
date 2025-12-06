@@ -25,17 +25,29 @@ function HeroSection() {
 
   // Auto slide
   useEffect(() => {
+    const startTimer = () => {
+      return setInterval(() => {
+        setIndex((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
+      }, intervalTime);
+    };
+
+    let interval = startTimer();
     const slider = sliderRef.current;
 
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
-    }, intervalTime);
+    const handleMouseEnter = () => clearInterval(interval);
+    const handleMouseLeave = () => {
+      clearInterval(interval); // Ensure no duplicate intervals
+      interval = startTimer();
+    };
 
-    // Pause on hover
-    slider.addEventListener("mouseenter", () => clearInterval(interval));
-    slider.addEventListener("mouseleave", () => clearInterval(interval));
+    slider.addEventListener("mouseenter", handleMouseEnter);
+    slider.addEventListener("mouseleave", handleMouseLeave);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      slider.removeEventListener("mouseenter", handleMouseEnter);
+      slider.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, []);
 
   // Keyboard navigation
@@ -59,9 +71,8 @@ function HeroSection() {
         {heroImages.map((img, i) => (
           <picture
             key={i}
-            className={`absolute inset-0 transition-opacity duration-[1s] ease-in-out ${
-              index === i ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-[1s] ease-in-out ${index === i ? "opacity-100" : "opacity-0"
+              }`}
           >
             {/* Responsive WebP */}
             <source srcSet={img.webp} type="image/webp" />

@@ -62,11 +62,10 @@ export default function Events() {
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`text-lg font-bold transition-colors ${currentSlide === idx ? "text-[#C0003D]" : "text-gray-300"
+              className={`transition-all duration-300 rounded-full ${currentSlide === idx ? "w-8 h-2 bg-[#C0003D]" : "w-2 h-2 bg-gray-300 hover:bg-gray-400"
                 }`}
-            >
-              {idx + 1}
-            </button>
+              aria-label={`Go to slide ${idx + 1}`}
+            />
           ))}
         </div>
 

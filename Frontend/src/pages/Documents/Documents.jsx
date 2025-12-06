@@ -1,69 +1,172 @@
+import React, { useState, useEffect } from 'react';
+import { FileText, ArrowRight, Calendar, Clock } from 'lucide-react';
+import { getDocuments } from '../../api/documentsApi';
+
 export default function Documents() {
-  const newsletters = [
-    {
-      title: "Quarterly Market Insights",
-      month: "October 2025",
-      excerpt: "Analysis of market trends, investment opportunities, and economic forecasts for the upcoming quarter.",
-      readTime: "5 min read"
-    },
-    {
-      title: "Student Finance Hacks",
-      month: "September 2025",
-      excerpt: "Practical tips and strategies for students to manage finances, save money, and invest wisely.",
-      readTime: "4 min read"
-    },
-    {
-      title: "Cryptocurrency Explained",
-      month: "August 2025",
-      excerpt: "A beginner's guide to understanding blockchain technology and digital currencies.",
-      readTime: "6 min read"
-    },
-    {
-      title: "Entrepreneurship in College",
-      month: "July 2025",
-      excerpt: "How to start your business while studying and balancing academic responsibilities.",
-      readTime: "7 min read"
-    },
-  ];
+  const [newsletters, setNewsletters] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await getDocuments();
+        const data = response.data;
+
+        // Filter documents based on type or properties
+        // Assuming 'type' field exists, or inferring from properties
+        const fetchedNewsletters = data.filter(doc => doc.type === 'newsletter' || doc.month);
+        const fetchedNotes = data.filter(doc => doc.type === 'note' || doc.date);
+
+        setNewsletters(fetchedNewsletters);
+        setNotes(fetchedNotes);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching documents:", err);
+        setError("Unable to load documents at this time.");
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 pb-24 flex justify-center items-center bg-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C0003D]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen pt-24 pb-24 flex justify-center items-center bg-white text-center px-4">
+        <div>
+          <p className="text-xl text-gray-800 mb-2">Oops! Something went wrong.</p>
+          <p className="text-gray-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <section className="container mx-auto px-4 py-12">
-      <h2 className="text-4xl font-bold mb-4 text-center" style={{ color: '#C0003D' }}>Newsletters</h2>
-      <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
-        Stay updated with our quarterly newsletters featuring financial insights, market analysis, and member achievements.
-      </p>
+    <div className="bg-white min-h-screen pt-24 pb-24">
 
-      <div className="grid gap-8 md:grid-cols-2">
-        {newsletters.map((n, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold" style={{ color: '#C0003D' }}>{n.title}</h3>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded" style={{ backgroundColor: '#FFECE6', color: '#E65C2A' }}>
-                  {n.readTime}
-                </span>
+      {/* Hero Header - Minimalist */}
+      <section className="container mx-auto px-6 mb-20 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+          Knowledge <span className="text-[#C0003D]">Hub</span>
+        </h1>
+        <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+          Access our latest newsletters, research papers, and event notes to stay ahead in the financial world.
+        </p>
+      </section>
+
+      {/* Featured / Navigation - Clean Categories */}
+      <section className="container mx-auto px-6 mb-24">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* Card 1 */}
+          <div className="bg-gray-50 rounded-2xl p-8 hover:bg-gray-100 transition-colors border border-gray-100 group cursor-pointer">
+            <div className="flex items-start justify-between mb-6">
+              <div className="p-3 bg-red-50 rounded-lg text-[#C0003D]">
+                <FileText size={24} />
               </div>
-              <p className="text-gray-500 text-sm mb-2">{n.month}</p>
-              <p className="text-gray-700 mb-6">{n.excerpt}</p>
-              <button className="font-medium flex items-center" style={{ color: '#C0003D' }}>
-                Read More
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
+              <ArrowRight className="text-gray-300 group-hover:text-[#C0003D] transition-colors" />
             </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Newsletters</h2>
+            <p className="text-gray-500 mb-4">
+              Detailed reports and analysis on current financial trends.
+            </p>
+            <span className="text-sm font-semibold text-[#C0003D] group-hover:underline decoration-[#C0003D] underline-offset-4">
+              Read Latest Issue
+            </span>
           </div>
-        ))}
-      </div>
 
-      <div className="mt-12 text-center">
-        <button
-          className="text-white font-bold py-3 px-8 rounded-full transition duration-300"
-          style={{ backgroundColor: '#C0003D' }}
-        >
-          View All Newsletters
-        </button>
-      </div>
-    </section>
+          {/* Card 2 */}
+          <div className="bg-gray-50 rounded-2xl p-8 hover:bg-gray-100 transition-colors border border-gray-100 group cursor-pointer">
+            <div className="flex items-start justify-between mb-6">
+              <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
+                <FileText size={24} />
+              </div>
+              <ArrowRight className="text-gray-300 group-hover:text-blue-600 transition-colors" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Event Notes</h2>
+            <p className="text-gray-500 mb-4">
+              Summaries and key takeaways from our exclusive sessions.
+            </p>
+            <span className="text-sm font-semibold text-blue-600 group-hover:underline decoration-blue-600 underline-offset-4">
+              View Collection
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletters Section */}
+      <section className="container mx-auto px-6 mb-24 max-w-6xl">
+        <div className="flex items-center justify-between mb-10 border-b border-gray-100 pb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Latest Newsletters</h2>
+          <button className="text-sm font-medium text-gray-500 hover:text-[#C0003D] transition-colors">View Archive</button>
+        </div>
+
+        {newsletters.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newsletters.map((item, idx) => (
+              <div key={idx} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group cursor-pointer h-full flex flex-col">
+                <div className="mb-4">
+                  <span className="text-xs font-bold text-[#C0003D] bg-red-50 px-2 py-1 rounded-md uppercase tracking-wide">
+                    {item.month || 'Recent'}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3 leading-snug group-hover:text-[#C0003D] transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-500 mb-6 flex-grow line-clamp-3">
+                  {item.excerpt || item.desc}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-gray-400 mt-auto pt-4 border-t border-gray-50">
+                  <Clock size={14} />
+                  <span>{item.readTime || '5 min read'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No newsletters available at the moment.</p>
+        )}
+      </section>
+
+      {/* Notes Section */}
+      <section className="container mx-auto px-6 max-w-6xl">
+        <div className="flex items-center justify-between mb-10 border-b border-gray-100 pb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Recent Event Notes</h2>
+          <button className="text-sm font-medium text-gray-500 hover:text-[#C0003D] transition-colors">View All Notes</button>
+        </div>
+
+        {notes.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {notes.map((note, idx) => (
+              <div key={idx} className="group cursor-pointer">
+                <div className="bg-gray-50 rounded-xl p-6 mb-3 border border-transparent group-hover:border-gray-200 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3 text-sm text-gray-400">
+                    <span className="flex items-center gap-1.5"><Calendar size={14} /> {note.date || 'Recent'}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                    {note.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-2">
+                    {note.desc || note.excerpt}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No event notes available at the moment.</p>
+        )}
+      </section>
+
+    </div>
   );
 }
